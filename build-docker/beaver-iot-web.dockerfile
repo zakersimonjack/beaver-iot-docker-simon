@@ -13,12 +13,13 @@ RUN git checkout ${WEB_GIT_BRANCH} && npm install -g pnpm && pnpm install && pnp
 FROM alpine:3.20 AS web
 COPY --from=web-builder /beaver-iot-web/apps/web/dist /web
 RUN apk add --no-cache envsubst nginx nginx-mod-http-headers-more
+COPY nginx/envsubst-on-templates.sh /envsubst-on-templates.sh
 COPY nginx/main.conf /etc/nginx/nginx.conf
 COPY nginx/templates /etc/nginx/templates
 
-ENV SERVER_HOST=172.17.0.1
-ENV SERVER_PORT=9200
-ENV WEBSOCKET_PORT=9201
+ENV BEAVER_IOT_API_HOST=172.17.0.1
+ENV BEAVER_IOT_API_PORT=9200
+ENV BEAVER_IOT_WEBSOCKET_PORT=9201
 
 EXPOSE 80
 

@@ -2,6 +2,7 @@ services:
   nginx:
     container_name: beaver-iot-nginx
     image: fabiocicerchia/nginx-lua:1.27.2-alpine3.20.3
+    restart: always
     ports:
       - "8080:80"
     volumes:
@@ -9,10 +10,12 @@ services:
       - "./target/standalone/nginx/conf.d/:/etc/nginx/conf.d/"
   web:
     container_name: beaver-iot-web
-    image: ${DOCKER_REPO:-milesight}/beaver-iot-web:${BEAVER_IOT_IMAGE_TAG:-latest}
-  server:
-    container_name: beaver-iot-server
-    image: ${DOCKER_REPO:-milesight}/beaver-iot-server:${BEAVER_IOT_IMAGE_TAG:-latest}
+    image: milesight/beaver-iot-web:latest
+    restart: always
+  api:
+    container_name: beaver-iot-api
+    image: milesight/beaver-iot-api:latest
+    restart: always
     environment:
       # override jvm options
       - "JAVA_OPTS=-Xmx1024m -Xms1024m"
@@ -32,6 +35,7 @@ services:
   postgresql:
     container_name: beaver-iot-postgresql
     image: postgres:17.0-alpine3.20
+    restart: always
     ports:
       - "5432:5432"
     environment:

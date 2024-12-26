@@ -1,12 +1,11 @@
 services:
   monolith:
     container_name: beaver-iot
-    image: ${DOCKER_REPO:-milesight}/beaver-iot:${BEAVER_IOT_IMAGE_TAG:-latest}
+    image: milesight/beaver-iot:latest
+    restart: always
     ports:
       - "8080:80"
     environment:
-      # tell the nginx where to find the api server
-      - "SERVER_HOST=localhost"
       # override jvm options
       - "JAVA_OPTS=-Xmx1024m -Xms1024m"
       # override spring properties
