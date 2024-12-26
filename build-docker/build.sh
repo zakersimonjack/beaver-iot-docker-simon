@@ -17,9 +17,9 @@ if [ -f "$WORK_DIR/.env" ]; then
 fi
 
 # config
-BUILD_TARGET=${BUILD_TARGET:-"web,server,monolith"}
+BUILD_TARGET=${BUILD_TARGET:-"web,api,monolith"}
 TARGET_PLATFORM=$TARGET_PLATFORM
-DOCKER_REPO=${DOCKER_REPO:-"beaver-iot"}
+DOCKER_REPO=${DOCKER_REPO:-"milesight"}
 BUILD_LATEST=${BUILD_LATEST:-true}
 PRODUCTION_TAG=${PRODUCTION_TAG:-"latest"}
 DOCKER_FILE=$DOCKER_FILE
@@ -29,11 +29,11 @@ DOCKER_BUILD_OPTION_REMOVE=${DOCKER_BUILD_OPTION_REMOVE:-false}
 DOCKER_BUILD_OPTION_NO_CACHE=${DOCKER_BUILD_OPTION_NO_CACHE:-true}
 
 # build args
-SERVER_GIT_REPO_URL=$SERVER_GIT_REPO_URL
-SERVER_GIT_BRANCH=$SERVER_GIT_BRANCH
-WEB_GIT_REPO_URL=$WEB_GIT_REPO_URL
-WEB_GIT_BRANCH=$WEB_GIT_BRANCH
-BASE_SERVER_IMAGE=${BASE_SERVER_IMAGE:-"$DOCKER_REPO/beaver-iot-server:$PRODUCTION_TAG"}
+API_GIT_REPO_URL=${API_GIT_REPO_URL:-"https://github.com/milesight-iot/beaver-iot.git"}
+API_GIT_BRANCH=${API_GIT_BRANCH:-"origin/release"}
+WEB_GIT_REPO_URL=${WEB_GIT_REPO_URL:-"https://github.com/milesight-iot/beaver-iot-web.git"}
+WEB_GIT_BRANCH=${WEB_GIT_BRANCH:-"origin/release"}
+BASE_API_IMAGE=${BASE_API_IMAGE:-"$DOCKER_REPO/beaver-iot-api:$PRODUCTION_TAG"}
 BASE_WEB_IMAGE=${BASE_WEB_IMAGE:-"$DOCKER_REPO/beaver-iot-web:$PRODUCTION_TAG"}
 
 user_args=()
@@ -48,8 +48,8 @@ function do_build() {
     web)
       PRODUCTION_NAME="beaver-iot-web"
       ;;
-    server)
-      PRODUCTION_NAME="beaver-iot-server"
+    api)
+      PRODUCTION_NAME="beaver-iot-api"
       ;;
     *)
       PRODUCTION_NAME="$1"
@@ -92,11 +92,11 @@ function do_build() {
 
   docker buildx build \
     --network=host \
-    --build-arg "SERVER_GIT_REPO_URL=${SERVER_GIT_REPO_URL}" \
-    --build-arg "SERVER_GIT_BRANCH=${SERVER_GIT_BRANCH}" \
+    --build-arg "API_GIT_REPO_URL=${API_GIT_REPO_URL}" \
+    --build-arg "API_GIT_BRANCH=${API_GIT_BRANCH}" \
     --build-arg "WEB_GIT_REPO_URL=${WEB_GIT_REPO_URL}" \
     --build-arg "WEB_GIT_BRANCH=${WEB_GIT_BRANCH}" \
-    --build-arg "BASE_SERVER_IMAGE=${BASE_SERVER_IMAGE}" \
+    --build-arg "BASE_API_IMAGE=${BASE_API_IMAGE}" \
     --build-arg "BASE_WEB_IMAGE=${BASE_WEB_IMAGE}" \
     -t "${DOCKER_REPO}/${PRODUCTION_NAME}:${PRODUCTION_TAG}" \
     -f "${DOCKER_FILE:-${CONTEXT_DIR}/${PRODUCTION_NAME}.dockerfile}" \
@@ -117,28 +117,25 @@ build() {
 show_help() {
   echo "Usage: $0 [OPTIONS]"
   echo "Options:"
-  echo "  -h, --help                                          Show this help message."
-  echo "  --build-target=<targets>                            Build targets, split by comma."
-  echo "  --build-target <targets>                            Build targets, split by comma."
-  echo "  --progress=plain                                    Show container output."
-  echo "  --tag=<tag>                                         Add tag to image."
+  echo "  -h, --help                                                              Show this help message."
+  echo "  --build-target=<targets>                                                Build targets, split by comma."
+  echo "  --build-target <targets>                                                Build targets, split by comma."
+  echo "  --progress=plain                                                        Show container output."
+  echo "  --tag=<tag>                                                             Add tag to image."
   echo "Environments:"
-  echo "  BUILD_TARGET=beaver-iot,beaver-iot-web              Build targets, split by comma."
-  echo "  TARGET_PLATFORM=[linux/amd64|linux/arm64]           Target platform, split by comma. If provided, buildx buildkit is required."
-  echo "  DOCKER_REPO=<registry>/beaver-iot                   Docker registry and repository."
-  echo "  BUILD_LATEST=[true|false]                           Tag built image with 'latest'. Default set to 'true'."
-  echo "  PRODUCTION_TAG=1.0.0                                Tag built image with specific tag."
-  echo "  DOCKER_FILE=./beaver-iot.dockerfile                 Dockerfile path. Don't change this unless you know what you are doing."
-  echo "  DOCKER_BUILD_OPTION_PUSH=[true|false]               Push built image to registry."
-  echo "  DOCKER_BUILD_OPTION_LOAD=[true|false]               Export built image to local containerd image store."
-  echo "  DOCKER_BUILD_OPTION_REMOVE=[true|false]             Remove intermediate containers."
-  echo "  DOCKER_BUILD_OPTION_NO_CACHE=[true|false]           Do not use cache. Default set to 'true' to ensure latest source code is always pulled from git."
-  echo "  SERVER_GIT_REPO_URL=https://github.com/milesight-iot/beaver-iot.git     Server git repository."
-  echo "  SERVER_GIT_BRANCH=origin/main                                           Server git branch."
-  echo "  WEB_GIT_REPO_URL=https://github.com/milesight-iot/beaver-iot-web.git    Web git repository."
-  echo "  WEB_GIT_BRANCH=origin/main                                              Web git branch."
-  echo "  BASE_SERVER_IMAGE                                                       Server base image for monolith image build."
-  echo "  BASE_WEB_IMAGE                                                          Web base image for monolith image build."
+  echo "  BUILD_TARGET=[beaver-iot-api|beaver-iot-web|beaver-iot]                 Build targets, split by comma."
+  echo "  TARGET_PLATFORM=[linux/amd64|linux/arm64]                               Target platform, split by comma. If provided, buildx buildkit is required."
+  echo "  DOCKER_REPO=<registry>/<repository>                                     Docker registry and repository."
+  echo "  BUILD_LATEST=[true|false]                                               Tag built image with 'latest'. Default set to 'true'."
+  echo "  PRODUCTION_TAG=1.0.0                                                    Tag built image with specific tag."
+  echo "  DOCKER_BUILD_OPTION_PUSH=[true|false]                                   Push built image to registry."
+  echo "  DOCKER_BUILD_OPTION_LOAD=[true|false]                                   Export built image to local containerd image store."
+  echo "  DOCKER_BUILD_OPTION_REMOVE=[true|false]                                 Remove intermediate containers."
+  echo "  DOCKER_BUILD_OPTION_NO_CACHE=[true|false]                               Do not use cache. Default set to 'true' to ensure latest source code is always pulled from git."
+  echo "  API_GIT_REPO_URL=https://github.com/milesight-iot/beaver-iot.git        Git repository for Beaver IoT API."
+  echo "  API_GIT_BRANCH=origin/release                                           Git branch for Beaver IoT API."
+  echo "  WEB_GIT_REPO_URL=https://github.com/milesight-iot/beaver-iot-web.git    Git repository for Beaver IoT Web."
+  echo "  WEB_GIT_BRANCH=origin/release                                           Git branch for Beaver IoT Web."
   exit 0
 }
 

@@ -21,17 +21,17 @@ touch build-docker/.env
 Edit the `.env` configuration file with the following content:
 
 ```dotenv
-# Load build results locally
+# Load the build result to `docker images`
 DOCKER_BUILD_OPTION_LOAD=true
-# Docker registry address (if any)
-DOCKER_REGISTRY=
+# Docker registry and repository
+DOCKER_REGISTRY=milesight
 # Image tag
 PRODUCTION_TAG=latest
 # Git repository URLs and branches
 WEB_GIT_REPO_URL=https://github.com/Milesight-IoT/beaver-iot-web.git
 WEB_GIT_BRANCH=origin/main
-SERVER_GIT_REPO_URL=https://github.com/Milesight-IoT/beaver-iot.git
-SERVER_GIT_BRANCH=origin/main
+API_GIT_REPO_URL=https://github.com/Milesight-IoT/beaver-iot.git
+API_GIT_BRANCH=origin/main
 ```
 
 > The subsequent build steps will use the configurations in this file, whether you use build.sh or docker compose.
@@ -56,7 +56,7 @@ For additional configuration options, use the --help option:
 ./build-docker/build.sh --help
 ```
 
-### Building via Docker Compose (Beta)
+### Building via Docker Compose
 
 If you don't have a Bash environment, you can build the images directly using the new version of Docker Compose:
 
