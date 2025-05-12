@@ -16,6 +16,11 @@ services:
     container_name: beaver-iot-api
     image: milesight/beaver-iot-api:latest
     restart: always
+    ports:
+      # mqtt
+      - "1883:1883"
+      # websocket
+      - "8083:8083"
     environment:
       # override jvm options
       - "JAVA_OPTS=-Xmx1024m -Xms1024m"
