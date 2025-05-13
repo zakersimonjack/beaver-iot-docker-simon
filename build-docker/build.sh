@@ -31,6 +31,7 @@ DOCKER_BUILD_OPTION_NO_CACHE=${DOCKER_BUILD_OPTION_NO_CACHE:-true}
 # build args
 API_GIT_REPO_URL=${API_GIT_REPO_URL:-"https://github.com/milesight-iot/beaver-iot.git"}
 API_GIT_BRANCH=${API_GIT_BRANCH:-"origin/release"}
+API_MVN_PROFILE=${API_MVN_PROFILE:-"release"}
 WEB_GIT_REPO_URL=${WEB_GIT_REPO_URL:-"https://github.com/milesight-iot/beaver-iot-web.git"}
 WEB_GIT_BRANCH=${WEB_GIT_BRANCH:-"origin/release"}
 BASE_API_IMAGE=${BASE_API_IMAGE:-"$DOCKER_REPO/beaver-iot-api:$PRODUCTION_TAG"}
@@ -94,6 +95,7 @@ function do_build() {
     --network=host \
     --build-arg "API_GIT_REPO_URL=${API_GIT_REPO_URL}" \
     --build-arg "API_GIT_BRANCH=${API_GIT_BRANCH}" \
+    --build-arg "API_MVN_PROFILE=${API_MVN_PROFILE}" \
     --build-arg "WEB_GIT_REPO_URL=${WEB_GIT_REPO_URL}" \
     --build-arg "WEB_GIT_BRANCH=${WEB_GIT_BRANCH}" \
     --build-arg "BASE_API_IMAGE=${BASE_API_IMAGE}" \
